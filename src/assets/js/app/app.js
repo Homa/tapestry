@@ -99,16 +99,14 @@ angular.module('tapestry', [
      * @param  {[type]} $http        [description]
      * @return {[type]}              [description]
      */
-    .run(['$rootScope', '$http', '$q', '$filter', '$cacheFactory', 'flattener',
-        function($rootScope, $http, $q, $filter, $cacheFactory, flattener){
+    .run(['$rootScope', '$http', '$q', '$filter', '$cacheFactory', 'flattener', 'patternData',
+        function($rootScope, $http, $q, $filter, $cacheFactory, flattener, patternData){
 
         $rootScope.styles = [];
 
-        /**
-         * Cachefactory
-         */
-
-        var cache = $cacheFactory.get('cache')
+        patternData.getPatternData().then(function(response) {
+            $rootScope.styles = response;
+        });
 
         /**
          * Change Title on routeChange
@@ -124,60 +122,6 @@ angular.module('tapestry', [
 
         });
 
-        /**
-         * Assign values to rootScope
-         */
-
-        var requests = [],
-            names = [],
-            slug = []
-
-        angular.forEach(jsonPath, function(value , key){
-
-            /* Add Pattern name in array */
-
-            names.push(value.name)
-
-            slug.push(value.slug)
-
-            /* Add requests in to array for $q */
-
-            requests.push($http.get(value.path, {cache: cache}))
-
-        })
-
-        /**
-         * When all requests are completed
-         */
-
-
-
-        $q.all(requests).then(function(response){
-
-            angular.forEach(response, function(r, i){
-
-                var parseObject = r.data;
-
-                /**
-                 * Create a Slug from the title
-                 * Reduces $watch on filter {{element.name | anchor}}
-                 */
-                angular.forEach(parseObject, function(value, key){
-                     value.slug = $filter('anchor')(value.name)
-                })
-
-                /**
-                 * Push to rootScope
-                 */
-
-                $rootScope.styles.push({
-                    name: names[i],
-                    slug: slug[i],
-                    data: parseObject
-                })
-
-            })
-        })
 
 
         /**
