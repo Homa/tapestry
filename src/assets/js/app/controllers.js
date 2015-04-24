@@ -7,19 +7,19 @@ angular.module('tapestry.controllers', [])
     .controller('headerController', ['$scope', 'isMobile', '$rootScope', '$filter', function($scope, isMobile, $rootScope, $filter){
 
         var $html = angular.element('html')
-        
+
         /**
          * Main Section
-         */                
+         */
 
         $scope.$on('sectionChange', function(scope, section, name){
 
             /* Main Section : elements or components */
             $rootScope.rootSection = name? $filter('anchor')(name): '';
-                
+
             /* Section title : Page elements */
 
-            $rootScope.section = section                        
+            $rootScope.section = section
 
             /* Section slug : page-elements */
 
@@ -31,11 +31,11 @@ angular.module('tapestry.controllers', [])
         /**
          * Menu Toggle
          */
-        
+
         $scope.toggleMenu = function($event){
 
             $event.stopPropagation()
-            
+
             $html.toggleClass('menu__opened');
 
         }
@@ -43,7 +43,7 @@ angular.module('tapestry.controllers', [])
         /**
          * Close menu when clicked outside
          */
-        
+
         $html.bind('click', function(){
 
             $html.removeClass('menu__opened');
@@ -53,7 +53,7 @@ angular.module('tapestry.controllers', [])
         /**
          * Stop propagation in menu
          */
-        
+
         document.getElementsByClassName('tapestry-menu')[0].addEventListener('click', function(e){
             e.stopPropagation()
         })
@@ -62,9 +62,8 @@ angular.module('tapestry.controllers', [])
     }])
 
     .controller('listingController', [
-        '$scope', 
-        '$http', 
-        '$routeParams', 
+        '$scope',
+        '$routeParams',
         '$location',
         '$rootScope',
         '$anchorScroll',
@@ -73,35 +72,35 @@ angular.module('tapestry.controllers', [])
         '$filter',
         '$route',
         'disqus_shortname'
-        , function($scope, $http, $routeParams, $location, $rootScope, $anchorScroll, $timeout, $interval, $filter, $route, disqus_shortname){
+        , function($scope, $routeParams, $location, $rootScope, $anchorScroll, $timeout, $interval, $filter, $route, disqus_shortname){
 
         /**
          * Disqus Enabled
          * @type {[boolean]}
          */
-        
+
         $scope.disqus_enabled = disqus_shortname? false: true;
-        
+
         var section = $location.$$path.split('/')[1],
-            element = $routeParams.slug            
+            element = $routeParams.slug
 
 
         $rootScope.$watch('styles', function(newValue){
 
             if(newValue){
                 angular.forEach($rootScope.styles, function(value, key){
-            
+
                     if(value.slug == section){
 
                         angular.forEach(value.data, function(v, k){
 
                             if(v.name.replace(/\s+/g, '-').toLowerCase() == element){
-                                
+
                                 $scope.patterns = value.data[k]
-                                
+
                                 /* Change to new section */
 
-                                $rootScope.$broadcast('sectionChange', v.name, value.name)   
+                                $rootScope.$broadcast('sectionChange', v.name, value.name)
                             }
 
                         })
@@ -111,19 +110,19 @@ angular.module('tapestry.controllers', [])
             }
 
         })
-        
+
 
         /**
          * Anchor
          */
-        
+
         $scope.anchor = function(name){
 
             return $filter('anchor')(name)
         }
-        
+
         /**
-         * Prevent route change         
+         * Prevent route change
          */
         var lastRoute = $route.current;
 
@@ -152,15 +151,15 @@ angular.module('tapestry.controllers', [])
                 $scope.scrollTo(top)
 
                 e.preventDefault();
-            
+
         })
-    
+
 
 
         /**
          * Scroll to Wrapper
          */
-        
+
         $scope.scrollTo = function(to){
 
             $('html, body').animate({
@@ -169,10 +168,10 @@ angular.module('tapestry.controllers', [])
 
         }
 
-        
+
         /**
          * Load Disqus Comments
-         */        
+         */
         var disqus_identifier;
         var disqus_url;
 
@@ -181,7 +180,7 @@ angular.module('tapestry.controllers', [])
             var source = $(event.currentTarget),
                 identifier = source.data('disqusIdentifier'),
                 thread = jQuery('#disqus_thread');
-            
+
             if (window.DISQUS) {
 
                 if(thread.length){
@@ -190,14 +189,14 @@ angular.module('tapestry.controllers', [])
 
                     thread = jQuery('<div id="disqus_thread"></div>').insertAfter(source);
                 }
-                
+
                 DISQUS.reset({
                     reload: true,
                     config: function () {
                         this.page.identifier = identifier;
                         this.page.url = window.location.href + '/' + identifier;
 
-                        
+
                     }
                 });
 
@@ -205,9 +204,9 @@ angular.module('tapestry.controllers', [])
             }else{
 
                jQuery('<div id="disqus_thread"></div>').insertAfter(source);
-               disqus_identifier = identifier; 
-               disqus_url = window.location.href + '/' + identifier;               
-               
+               disqus_identifier = identifier;
+               disqus_url = window.location.href + '/' + identifier;
+
                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
                 dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
                 (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
@@ -219,9 +218,9 @@ angular.module('tapestry.controllers', [])
         /**
          * Scroll to the section
          */
-        
+
         angular.element('body').unbind('tapestry.completed.scrollspy');
-        
+
         if($routeParams.section){
 
             $rootScope.subSection = $routeParams.section;
@@ -238,26 +237,26 @@ angular.module('tapestry.controllers', [])
                         headerHeight = $('.tapestry-header').outerHeight()
 
                     /**
-                     * Scroll to the section                 
+                     * Scroll to the section
                      */
                     angular.element('body').bind('tapestry.completed.scrollspy', function(){
-                        
+
                         var top = anchor.length? anchor.position().top : 0,
                         headerHeight = $('.tapestry-header').outerHeight()
 
                         $scope.scrollTo(top - headerHeight + 80)
 
-                        
+
                     })
-                    
-                    
+
+
                 }
 
 
             }, 150)
 
-            
-            
+
+
         }else{
 
             $scope.scrollTo(0)
@@ -282,18 +281,18 @@ angular.module('tapestry.controllers', [])
 
 
         angular.forEach($rootScope.styles, function(value, key){
-            
+
             if(value.slug == section){
 
                 angular.forEach(value.data, function(v, k){
 
                     if(v.name.replace(/\s+/g, '-').toLowerCase() == element){
-                        
+
                         $scope.templates = value.data[k]
-                        
+
                         /* Change to new section */
 
-                        $rootScope.$broadcast('sectionChange', v.name, value.name)   
+                        $rootScope.$broadcast('sectionChange', v.name, value.name)
                     }
 
                 })
@@ -302,6 +301,6 @@ angular.module('tapestry.controllers', [])
         });
 
         //console.log($scope.templates)
-        
+
     }])
 ;
